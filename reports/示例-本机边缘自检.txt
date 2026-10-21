@@ -1,0 +1,76 @@
+NetMouse 本机边缘自检
+生成时间 : 2026/10/11 20:46:09
+平台     : win32 x64
+运行环境 : Electron 31.7.7 / Node 20.18.0
+
+几何
+  虚拟桌面 1280x800 @ (0,0)
+  显示器
+  #0(主) 1280x800@(0,0) 100% dip 1280x800@(0,0)
+  触发矩形 1280x800 @ (0,0)  （整个虚拟桌面）
+
+各边归属
+  left    显示器 #0（主屏）   触发位置 x=0
+  right   显示器 #0（主屏）   触发位置 x=1279
+  top     显示器 #0（主屏）   触发位置 y=0
+  bottom  显示器 #0（主屏）   触发位置 y=799
+
+自检（真实全局钩子 + 真实光标 + 真实 TCP 回环）
+  [1/4] left (左)
+         目标点 (0,400)   光标停在 (0,400)
+         捕获 ✓  触发位置距该边 0px
+         对端收到 enter ✓  vw=1280 vh=800 edge=left
+         release 后回到本地 ✓
+  [2/4] right (右)
+         目标点 (1279,400)   光标停在 (1279,400)
+         捕获 ✓  触发位置距该边 0px
+         对端收到 enter ✓  vw=1280 vh=800 edge=right
+         release 后回到本地 ✓
+  [3/4] top (上)
+         目标点 (640,0)   光标停在 (640,0)
+         捕获 ✓  触发位置距该边 0px
+         对端收到 enter ✓  vw=1280 vh=800 edge=top
+         release 后回到本地 ✓
+  [4/4] bottom (下)
+         目标点 (640,799)   光标停在 (640,799)
+         捕获 ✓  触发位置距该边 0px
+         对端收到 enter ✓  vw=1280 vh=800 edge=bottom
+         release 后回到本地 ✓
+
+按键与滚轮（真实钩子读数 → 客户端映射）
+  左键   真实钩子报 button=1   映射 → pressButton(0 = LEFT)  ✓
+  右键   真实钩子报 button=2   映射 → pressButton(2 = RIGHT)  ✓
+  中键   真实钩子报 button=3   映射 → pressButton(1 = MIDDLE)  ✓
+  滚轮上 真实钩子报 rotation=-1（方向 3）   映射 → scrollUp(120)  ✓
+  滚轮下 真实钩子报 rotation=1（方向 3）   映射 → scrollDown(120)  ✓
+  不足一格 rotation=0   映射 → 忽略  ✓
+         （正确：不足一格的增量不产生任何滚动）
+
+结论
+  配置的共享边 layout.edge = right（自检过程中每条边都临时切过去试了）
+  ✓ 测试的 4 条边全部可触发，且 enter / release 都正常。
+    本机 server 侧（几何换算、边缘判定、协议发送）完全正常。
+    若对端仍然不动，问题在 client 机器或两端之间的网络，不在这一侧。
+
+    提示：当前 layout.edge 是 right。若对端（Ubuntu）在左侧，
+    必须把它改成 left，或改成 any —— 否则往左推永远不会有反应。
+
+  ✓ 按键与滚轮：6 项全部通过。
+    本机的左/中/右键和滚轮，都以客户端能正确识别的形式发出去了；
+    对端若仍然点不动或滚不动，问题在 client 的注入权限，不在这一侧。
+
+对端共收到 4 条消息：enter
+
+相关日志
+  captured -> forwarding to peer (right)
+  released -> local control
+  共享边切换为 top
+  共享边 top 属于显示器 #0（主屏）
+  靠近共享边 top，还差 29px，再推一点就会交出去
+  captured -> forwarding to peer (top)
+  released -> local control
+  共享边切换为 bottom
+  共享边 bottom 属于显示器 #0（主屏）
+  靠近共享边 bottom，还差 29px，再推一点就会交出去
+  captured -> forwarding to peer (bottom)
+  released -> local control

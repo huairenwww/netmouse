@@ -1,0 +1,754 @@
+:root {
+  --bg: #eef2f8;
+  --card: #ffffff;
+  --line: #dbe3ef;
+  --text: #1e293b;
+  --muted: #64748b;
+  --accent: #2563eb;
+  --accent-soft: #e0ecff;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --err: #dc2626;
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+  font: 13.5px/1.5 "Segoe UI", "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ---------------------------------------------------------------- topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 2px 10px rgba(30, 64, 175, 0.25);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #fff;
+  padding: 2px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+}
+
+.sub {
+  margin: 1px 0 0;
+  font-size: 11.5px;
+  opacity: 0.82;
+}
+
+.runstate {
+  display: flex;
+  gap: 8px;
+}
+
+.pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pill--on {
+  background: #bbf7d0;
+  color: #14532d;
+}
+.pill--off {
+  background: rgba(255, 255, 255, 0.2);
+  color: #eaf1ff;
+}
+.pill--warn {
+  background: #fde68a;
+  color: #78350f;
+}
+.pill--err {
+  background: #fecaca;
+  color: #7f1d1d;
+}
+.pill--ghost {
+  background: rgba(255, 255, 255, 0.16);
+  color: #eaf1ff;
+}
+.pill--remote {
+  background: #fde68a;
+  color: #78350f;
+}
+
+/* ---------------------------------------------------------------- layout */
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px 16px;
+  overflow: auto;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 15px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.card h2 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+
+.card--grow {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------------- fields */
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 7px;
+}
+
+.field > span:first-child {
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+
+/* A field that belongs to the checkbox directly above it: indented to the
+   checkbox label, not to the card edge, so the grouping is visible. */
+.field--indent {
+  margin-left: 23px;
+}
+
+/* "120 px", "8 MB" -- a number input with its unit written after it. */
+.unit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+
+input[type="number"],
+input[type="text"],
+input[type="password"],
+select {
+  width: 160px;
+  max-width: 60%;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: var(--text);
+  font: inherit;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.pw {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 60%;
+}
+
+.pw input {
+  width: 130px;
+  max-width: none;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+}
+
+/* A checkbox sitting inside a .btnrow next to buttons: the row already owns the
+   spacing, and `margin-bottom: 8px` would knock it out of alignment. */
+.check--inline {
+  margin-bottom: 0;
+  font-size: 12px;
+}
+
+.hint {
+  margin: 4px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* Small badge inside a card heading (e.g. the portable-build marker). */
+.tag {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* ------------------------------------------------------------ segmented */
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  gap: 3px;
+  background: #eef2f8;
+  border-radius: 10px;
+}
+
+.segmented button {
+  border: 0;
+  background: transparent;
+  padding: 7px 20px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.segmented button.on {
+  background: #fff;
+  color: var(--accent);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.14);
+}
+
+/* ------------------------------------------------------------ edge pick */
+.edgepick {
+  display: grid;
+  grid-template-columns: 46px 118px 46px;
+  grid-template-rows: 30px 64px 30px 30px;
+  gap: 6px;
+  justify-content: center;
+  margin: 8px 0 10px;
+}
+
+.edgepick button {
+  border: 1px dashed var(--line);
+  background: #f8fafc;
+  border-radius: 8px;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.edgepick button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.edgepick button.on {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+.edgepick .e-top {
+  grid-area: 1 / 2;
+}
+.edgepick .e-left {
+  grid-area: 2 / 1;
+}
+.edgepick .e-right {
+  grid-area: 2 / 3;
+}
+.edgepick .e-bottom {
+  grid-area: 3 / 2;
+}
+
+.edgepick .e-any {
+  grid-area: 4 / 1 / 5 / 4;
+  font-size: 12px;
+}
+
+.edgepick .screen {
+  grid-area: 2 / 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.res {
+  display: flex;
+  gap: 10px;
+}.res .field {
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.res .field > span:first-child {
+  font-size: 11.5px;
+}
+
+.res input {
+  width: 100%;
+  max-width: none;
+}
+
+/* ---------------------------------------------------------------- status */
+.kv {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 14px;
+  margin: 0 0 12px;
+}
+
+.kv dt {
+  color: var(--muted);
+}
+
+.kv dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: 1px;
+}
+
+.dot--ok {
+  background: var(--ok);
+}
+.dot--warn {
+  background: var(--warn);
+}
+.dot--err {
+  background: var(--err);
+}
+.dot--off {
+  background: #94a3b8;
+}
+
+/* --------------------------------------------------------------- buttons */
+.btn {
+  padding: 7px 15px;
+  border: 1px solid var(--accent);
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:hover {
+  filter: brightness(1.06);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+  filter: none;
+}
+
+.btn--ghost {
+  background: #fff;
+  color: var(--accent);
+  border-color: var(--line);
+}
+
+.btn--ghost:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.btn--primary {
+  background: var(--accent);
+  min-width: 108px;
+}
+
+.mini {
+  padding: 2px 9px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.mini:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btnrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- paths */
+.pathbox {
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8fafc;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.pathbox code {
+  font-family: "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
+  font-size: 11.5px;
+  overflow-wrap: anywhere;
+  color: #334155;
+}
+
+/* -------------------------------------------------------------- warnings */
+.warns {
+  margin: 0;
+  padding-left: 18px;
+  color: #92400e;
+  font-size: 12.5px;
+}
+
+.warns li {
+  margin-bottom: 5px;
+}
+
+/* ------------------------------------------------------------------ log */
+.log {
+  flex: 1;
+  min-height: 120px;
+  max-height: 220px;
+  overflow: auto;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0f172a;
+  color: #cbd5e1;
+  font-family: "Cascadia Mono", Consolas, "DejaVu Sans Mono", monospace;
+  font-size: 11.5px;
+  line-height: 1.55;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.log div {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.log .lv-error {
+  color: #fca5a5;
+}
+.log .lv-warn {
+  color: #fcd34d;
+}
+.log .lv-info {
+  color: #93c5fd;
+}
+.log .lv-debug {
+  color: #94a3b8;
+}
+
+.log time {
+  opacity: 0.55;
+  margin-right: 6px;
+}
+
+/* ------------------------------------------------------------ actionbar */
+.actionbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+.save-msg {
+  margin-right: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.save-msg.ok {
+  color: var(--ok);
+}
+
+.save-msg.err {
+  color: var(--err);
+}
+
+/* ------------------------------------------------------- geometry panel */
+/* Per-monitor physical rects + which monitor owns each boundary. This is the
+   table the edge detection actually uses, so showing it makes a wrong
+   `layout.edge` or an off-screen shared edge obvious at a glance. */
+.geom {
+  margin: 10px 0 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #f8fafc;
+}
+
+.geom-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.geom-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.geom-list li {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--text);
+}
+
+.geom-list li.primary {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.geom-edge {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.geom-edge b {
+  color: var(--text);
+}
+
+.geom-edge .warnline {
+  color: var(--warn);
+}
+
+/* ------------------------------------------------- platform split (v0.2.4) */
+/* The OS badge in the header: the one thing that tells you which column of
+   the comparison table is yours. */
+.pill--os {
+  background: rgba(255, 255, 255, 0.92);
+  color: #1d4ed8;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Scope chip on a card heading: which machine the card's options affect. */
+.scope {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  vertical-align: 1px;
+  white-space: nowrap;
+}
+
+.scope--server {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.scope--client {
+  background: #dcfce7;
+  color: #15803d;
+}
+.scope--both {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+/* Platform-specific runtime block inside the "本机平台" card. */
+.osblock {
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.osblock-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+  margin-bottom: 6px;
+}
+
+.oslist {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 11.5px;
+  line-height: 1.75;
+  color: var(--muted);
+}
+
+.oslist li {
+  overflow-wrap: anywhere;
+}
+
+/* Sub-heading inside a card that is split by concern. */
+.subhead {
+  margin: 14px 0 8px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+}
+
+/* ------------------------------------------------ platform comparison table */
+.difftable {
+  margin-top: 8px;
+  font-size: 11.5px;
+}
+
+.diffrow {
+  display: grid;
+  grid-template-columns: 96px 1fr 1fr;
+  gap: 6px;
+  padding: 6px 0 2px;
+  border-top: 1px solid var(--line);
+  align-items: start;
+}
+
+.diffrow--head {
+  border-top: none;
+  padding-bottom: 6px;
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 0.3px;
+}
+
+.diffaspect {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.diffcell {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+/* The column belonging to the machine you are looking at. */
+.diffcell--local {
+  background: var(--accent-soft);
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.diffnote {
+  grid-column: 1 / -1;
+  padding: 0 0 6px 102px;
+  font-size: 10.5px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+/* The other platform's runtime block: kept visible for reference, but clearly
+   not this machine's configuration. Hidden entirely when the filter is on. */
+.osblock--other {
+  opacity: 0.6;
+  background: #fcfdff;
+}
+
+.osblock--other .osblock-title::after {
+  content: "（非本机，仅供参考）";
+  font-weight: 400;
+}

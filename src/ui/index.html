@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:;"
+    />
+    <title>NetMouse 设置</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img class="logo" src="../assets/icon.png" alt="" />
+        <div>
+          <h1>NetMouse</h1>
+          <p class="sub">一套键鼠，两台电脑 · Windows 11 / Ubuntu</p>
+        </div>
+      </div>
+      <div class="runstate">
+        <span id="osPill" class="pill pill--os">—</span>
+        <span id="runPill" class="pill pill--off">已停止</span>
+        <span id="modePill" class="pill pill--ghost">本地</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- ------------------------------------------------ left column -->
+      <div class="col">
+        <section class="card" id="cardPlatform">
+          <h2>本机平台 <span class="tag" id="osTag">—</span></h2>
+          <dl class="kv" id="platList"></dl>
+          <p class="hint" id="platHint"></p>
+
+          <!-- Platform-specific runtime facts. Only one of these is ever
+               relevant; the toggle below hides the other one. -->
+          <div class="osblock" data-os="linux" id="osLinux" hidden>
+            <div class="osblock-title">Linux / Ubuntu 运行时</div>
+            <ul class="oslist" id="osLinuxList"></ul>
+          </div>
+          <div class="osblock" data-os="win32" id="osWin" hidden>
+            <div class="osblock-title">Windows 11 运行时</div>
+            <ul class="oslist" id="osWinList"></ul>
+          </div>
+
+          <label class="check">
+            <input type="checkbox" id="onlyLocal" />
+            <span>只显示本机适用的选项（隐藏另一平台的专用项）</span>
+          </label>
+        </section>
+
+        <section class="card">
+          <h2>角色</h2>
+          <div class="segmented" id="roleSeg">
+            <button type="button" data-value="server">服务器</button>
+            <button type="button" data-value="client">客户端</button>
+          </div>
+          <p class="hint" id="roleHint"></p>
+        </section>
+
+        <section class="card" id="cardServer" data-scope="server">
+          <h2>服务器设置 <span class="scope scope--server">仅服务器</span></h2>
+          <label class="field">
+            <span>监听端口</span>
+            <input id="listenPort" type="number" min="1" max="65535" />
+          </label>
+          <p class="hint">插着物理鼠标键盘的那台，等客户端连过来。</p>
+        </section>
+
+        <section class="card" id="cardClient" data-scope="client">
+          <h2>客户端设置 <span class="scope scope--client">仅客户端</span></h2>
+          <label class="field">
+            <span>服务器地址</span>
+            <input id="peerHost" type="text" placeholder="192.168.1.50" />
+          </label>
+          <label class="field">
+            <span>服务器端口</span>
+            <input id="peerPort" type="number" min="1" max="65535" />
+          </label>
+          <label class="field">
+            <span>连接密码</span>
+            <span class="pw">
+              <input id="peerPassword" type="password" autocomplete="off" />
+              <button type="button" id="togglePw" class="mini">显示</button>
+            </span>
+          </label>
+          <p class="hint">两端密码必须完全一致，否则会被服务器拒绝。</p>
+
+          <div class="subhead">本机注入（由客户端所在的操作系统决定）</div>
+          <label class="field">
+            <span>输入注入方式</span>
+            <select id="inputBackend">
+              <option value="auto">自动（推荐）</option>
+              <option value="xtest">XTest（仅 X11）</option>
+              <option value="uinput">uinput（Wayland 用）</option>
+            </select>
+          </label>
+          <p class="hint" id="inputBackendHint"></p>
+          <label class="check">
+            <input type="checkbox" id="manageYdotoold" />
+            <span>自动管理 ydotoold（ydotool 必需，dotool 不需要）</span>
+          </label>
+          <p class="hint" id="manageYdotooldHint"></p>
+          <label class="field">
+            <span>滚轮「一格」= 多少单位</span>
+            <input id="scrollUnit" type="number" min="0" max="1000" />
+          </label>
+          <p class="hint" id="scrollUnitHint"></p>
+
+          <div class="btnrow">
+            <button type="button" id="injecttestBtn" class="btn btn--ghost">本机注入自检</button>
+          </div>
+          <p class="hint" id="injecttestHint">
+            检验本机作为客户端能不能真的驱动自己的光标、按键和滚轮 ——
+            走的是客户端真正使用的注入路径，原生层没有替身。全程约 5 秒，
+            期间光标会被接管，结束后自动还原。
+            「对端鼠标不动 / 点了没反应」先在本机跑这个：它能把「本机注入坏了」
+            和「服务器或网络没送到」分开。客户端侧的自检只有这一个，
+            「本机边缘自检」检验的是服务器侧，在客户端上跑不出结论。
+          </p>
+        </section>
+
+        <section class="card">
+          <h2>屏幕布局 <span class="scope scope--server">主要影响服务器</span></h2>
+          <p class="hint" id="edgeHint"></p>
+          <div class="edgepick" id="edgePick">
+            <button type="button" data-edge="top" class="e-top">上</button>
+            <button type="button" data-edge="left" class="e-left">左</button>
+            <div class="screen"><span id="edgeScreenLabel">本机</span></div>
+            <button type="button" data-edge="right" class="e-right">右</button>
+            <button type="button" data-edge="bottom" class="e-bottom">下</button>
+            <button type="button" data-edge="any" class="e-any">任意边都触发</button>
+          </div>
+          <div class="res">
+            <label class="field">
+              <span>服务器虚拟桌面 宽</span>
+              <input id="screenWidth" type="number" min="1" />
+            </label>
+            <label class="field">
+              <span>服务器虚拟桌面 高</span>
+              <input id="screenHeight" type="number" min="1" />
+            </label>
+          </div>
+          <label class="field">
+            <span>触发边缘的显示器</span>
+            <select id="monitor">
+              <option value="all">全部（整个虚拟桌面）</option>
+              <option value="primary">主显示器</option>
+            </select>
+          </label>
+          <button type="button" id="detectBtn" class="btn btn--ghost">检测本机多屏布局</button>
+          <p class="hint" id="resHint"></p>
+
+          <div class="geom" id="geomBox" hidden>
+            <div class="geom-title">本机屏幕布局（边缘判定用的就是这张表）</div>
+            <ul class="geom-list" id="geomList"></ul>
+            <div class="geom-edge" id="geomEdge"></div>
+          </div>
+
+          <div class="btnrow">
+            <button type="button" id="diagBtn" class="btn btn--ghost">运行诊断并生成报告</button>
+            <button type="button" id="hwtestBtn" class="btn btn--ghost">本机边缘自检</button>
+          </div>
+
+          <div class="btnrow">
+            <button type="button" id="bundleBtn" class="btn btn--ghost">一键诊断包（.zip）</button>
+            <label class="check check--inline">
+              <input type="checkbox" id="bundleLive" checked />
+              <span>包含两个自检</span>
+            </label>
+          </div>
+          <p class="hint" id="bundleHint">
+            把「配置 + 日志 + 三份自检报告」打成一个 zip，方便直接发给帮忙排查的人。
+            密码会被替换成长度标记、路径里的家目录会折叠成 <code>~</code>，
+            包是在本机生成的，发不发由你决定。勾掉上面的「包含两个自检」可以只收配置和日志
+            （更快，也不会接管光标）。<b>两端各生成一份最有价值</b> ——
+            只看一台分不清是「本机没发出去」还是「对端没注入成功」。
+          </p>
+          <p class="hint" id="hwtestHint">
+            自检会用真实全局钩子和真实光标，把鼠标依次推到四条边的外缘，
+            检验「边缘判定 + 交接协议」在本机是否正常，并读出本机真实的按键与滚轮读数。
+            全程约 10 秒，期间光标会被接管，结束后自动还原。它不需要第二台机器 ——
+            如果本机四条边都能触发，问题就在对端或网络。
+          </p>
+        </section>
+
+        <section class="card" id="cardInput" data-scope="server">
+          <h2>输入拦截 <span class="scope scope--server">仅服务器</span></h2>
+          <label class="check">
+            <input type="checkbox" id="blockLocal" />
+            <span>远程控制时拦截本机物理键鼠（避免误点到本机窗口）</span>
+          </label>
+          <label class="field">
+            <span>逃生热键（立即交还本地控制）</span>
+            <input id="panicHotkey" type="text" placeholder="Ctrl+Alt+Shift+Q" />
+          </label>
+          <p class="hint">
+            拦截由一层全屏透明遮罩实现：远程期间指针落在遮罩上，不会点到本机程序。
+            键盘焦点是尽力而为。若被遮罩挡住，按上面的逃生热键即可立刻取回控制。
+          </p>
+          <label class="field">
+            <span>捕获方式</span>
+            <select id="inputCapture">
+              <option value="auto">自动（推荐）</option>
+              <option value="uiohook">uiohook（X11 / Xwayland）</option>
+              <option value="evdev">evdev（直接读 /dev/input）</option>
+            </select>
+          </label>
+          <p class="hint" id="inputCaptureHint"></p>
+        </section>
+
+        <section class="card">
+          <h2>其他 <span class="scope scope--both">两端通用</span></h2>
+          <label class="field">
+            <span>日志级别</span>
+            <select id="logLevel">
+              <option value="error">error</option>
+              <option value="warn">warn</option>
+              <option value="info">info</option>
+              <option value="debug">debug</option>
+            </select>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="autoStart" />
+            <span>启动程序时自动运行</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="minimizeToTray" />
+            <span>关闭窗口时最小化到托盘</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="clipboardEnabled" />
+            <span>与对端共享剪贴板</span>
+          </label>
+          <label class="check">
+            <input type="checkbox" id="clipboardImages" />
+            <span>同时同步剪贴板里的图片</span>
+          </label>
+          <label class="field field--indent">
+            <span>图片大小上限</span>
+            <span class="unit">
+              <input type="number" id="clipboardMaxImageMB" min="0.1" max="64" step="0.1" />
+              MB
+            </span>
+          </label>
+          <p class="hint" id="clipboardHint"></p>
+        </section>
+      </div>
+
+      <!-- ----------------------------------------------- right column -->
+      <div class="col">
+        <section class="card">
+          <h2>运行状态</h2>
+          <dl class="kv" id="statusList"></dl>
+          <div class="btnrow">
+            <button type="button" id="startBtn" class="btn">启动</button>
+            <button type="button" id="stopBtn" class="btn btn--ghost">停止</button>
+            <button type="button" id="restartBtn" class="btn btn--ghost">重启</button>
+            <button type="button" id="releaseBtn" class="btn btn--ghost" hidden>交还本地控制</button>
+          </div>
+        </section>
+
+        <section class="card" id="cardDiff">
+          <h2>Windows 11 / Ubuntu 差异对照</h2>
+          <p class="hint">
+            同一个配置文件两端通用，但下面这些行为由**操作系统**决定，改配置也统一不了。
+            本机所在的那一列会高亮。
+          </p>
+          <div class="difftable" id="diffTable"></div>
+        </section>
+
+        <section class="card">
+          <h2>配置文件 <span class="tag" id="portableTag" hidden>免安装 · 便携版</span></h2>
+          <div class="pathbox"><code id="configPath">-</code></div>
+          <p class="hint" id="configNote"></p>
+          <div class="btnrow">
+            <button type="button" id="openFileBtn" class="btn btn--ghost">打开文件</button>
+            <button type="button" id="openFolderBtn" class="btn btn--ghost">打开文件夹</button>
+            <button type="button" id="reloadBtn" class="btn btn--ghost">重新载入</button>
+          </div>
+        </section>
+
+        <section class="card" id="warnCard" hidden>
+          <h2>环境提示</h2>
+          <ul class="warns" id="warnList"></ul>
+        </section>
+
+        <section class="card card--grow">
+          <h2>
+            日志
+            <button type="button" id="clearLogBtn" class="mini">清空</button>
+          </h2>
+          <div class="log" id="log"></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="actionbar">
+      <span class="save-msg" id="saveMsg"></span>
+      <button type="button" id="saveBtn" class="btn btn--ghost">保存</button>
+      <button type="button" id="saveRestartBtn" class="btn btn--primary">保存并重启</button>
+    </footer>
+
+    <script src="./renderer.js"></script>
+  </body>
+</html>

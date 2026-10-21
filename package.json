@@ -1,0 +1,115 @@
+{
+  "name": "netmouse",
+  "version": "0.2.12",
+  "description": "Software KVM: share one mouse/keyboard across two computers over LAN (Linux + Windows 11)",
+  "author": "netmouse",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "start:headless": "node src/cli.js",
+    "doctor": "node src/doctor.js",
+    "diag": "electron src/diag.js",
+    "diag:live": "electron src/diag.js --live",
+    "hwtest": "electron src/hwtest.js",
+    "injecttest": "electron src/injecttest.js",
+    "selftest": "node src/selftest.js",
+    "test:platform": "node test/platform-dpi.js",
+    "test:input": "node test/input-units.js",
+    "test:uinput": "node test/uinput-units.js",
+    "test:ydotoold": "node test/ydotoold-units.js",
+    "test:ui": "node test/ui-check.js",
+    "test:injecttest": "node test/injecttest-units.js",
+    "test:diagbundle": "node test/diagbundle-units.js",
+    "test:clipboard": "node test/clipboard-units.js",
+    "test:capture": "node test/capture-units.js",
+    "test:hwtest": "node test/hwtest-units.js",
+    "test:e2e": "node test/e2e.js",
+    "test": "node src/selftest.js && node test/platform-dpi.js && node test/input-units.js && node test/injecttest-units.js && node test/clipboard-units.js && node test/capture-units.js && node test/diagbundle-units.js && node test/uinput-units.js && node test/ydotoold-units.js && node test/ui-check.js && node test/hwtest-units.js && node test/e2e.js",
+    "build:win": "electron-builder --win portable zip --x64",
+    "build:win:installer": "electron-builder --win nsis --x64",
+    "build:linux": "electron-builder --linux --x64",
+    "build:linux:portable": "electron-builder --linux dir --x64 && python3 scripts/package-linux-portable.py",
+    "build:linux:appimage": "electron-builder --linux AppImage --x64",
+    "build:linux:deb": "electron-builder --linux deb --x64",
+    "build:src": "python3 scripts/make-src-zip.py"
+  },
+  "dependencies": {
+    "uiohook-napi": "^1.5.5",
+    "@nut-tree-fork/nut-js": "^4.2.6"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.otherapi.netmouse",
+    "productName": "NetMouse",
+    "files": [
+      "src/**/*",
+      "config.json"
+    ],
+    "extraFiles": [
+      {
+        "from": "config.json",
+        "to": "config.json"
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/uiohook-napi/**",
+      "**/node_modules/@nut-tree-fork/**"
+    ],
+    "npmRebuild": false,
+    "win": {
+      "target": [
+        "portable",
+        "zip"
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "NetMouse-${version}-win-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "NetMouse-${version}-portable-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "NetMouse",
+      "artifactName": "NetMouse-${version}-setup-${arch}.${ext}"
+    },
+    "linux": {
+      "extraResources": [
+        {
+          "from": "bin",
+          "to": "bin"
+        }
+      ],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Utility",
+      "icon": "build/icons",
+      "executableName": "netmouse",
+      "artifactName": "NetMouse-${version}-linux-${arch}.${ext}",
+      "synopsis": "Share one mouse/keyboard across two computers over LAN",
+      "description": "Software KVM: the machine with the physical mouse and keyboard (server) hands control to a second machine (client) when the cursor reaches the shared screen edge.",
+      "desktop": {
+        "entry": {
+          "Name": "NetMouse",
+          "Comment": "一套键鼠跨两台电脑使用",
+          "Categories": "Utility;Network;",
+          "StartupWMClass": "NetMouse"
+        }
+      }
+    },
+    "deb": {
+      "recommends": [
+        "xdotool"
+      ]
+    }
+  }
+}

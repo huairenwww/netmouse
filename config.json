@@ -1,0 +1,69 @@
+{
+  // server = 插着物理鼠标键盘的那台；client = 被控制的那台
+  "role": "server",
+
+  // server 监听端口
+  "listenPort": 24800,
+
+  "peer": {
+    // server 不用填；client 填 server 的局域网 IP
+    "host": "",
+    // client 连接 server 的端口
+    "port": 24800,
+    // 两端必须完全一致
+    "password": "change-me-strong-password"
+  },
+
+  "layout": {
+    // server 共享出去的那条边：left | right | top | bottom | any
+    // any = 鼠标碰到任意一条边都交出去（不确定对端在哪一侧时用它最省事）
+    // 注意：client 端不用手工填，运行时会自动采用 server 发来的边
+    "edge": "right",
+    // server 的虚拟桌面尺寸（多屏是拼起来的总尺寸）。运行时自动检测，这里是兜底值。
+    "screenWidth": 1920,
+    "screenHeight": 1080,
+    // 从哪块屏幕的边缘切出：all（整个虚拟桌面）| primary（主屏）| 0 | 1 ...
+    // 多屏时若对端在左侧，通常要选具体的左屏，而不是 all。
+    "monitor": "all"
+  },
+
+  // error | warn | info | debug
+  "logging": { "level": "info" },
+
+  "input": {
+    // server 驱动对端时，是否吞掉本机物理键鼠（避免误点到本机窗口）
+    "blockLocal": true,
+    // 全局逃生热键：无论焦点在哪都生效，立即交还本地控制并解除拦截
+    "panicHotkey": "Ctrl+Alt+Shift+Q",
+    // 滚轮：多少「单位」算一格。0 = 按平台自动（Windows 120，Linux/macOS 1）。
+    // nut-js 的滚轮量在不同系统上含义不同，已经自动处理；
+    // 只有当滚轮明显「太快 / 几乎不动」且相差约 120 倍时才需要改这里。
+    // 注意：这只对 XTest 后端有效；uinput 后端收的是「格数」，与它无关。
+    "scrollUnit": 0,
+    // 客户端在本机怎么注入输入：auto（推荐）| xtest | uinput
+    //   auto   X11 用 XTest；Wayland 下若装了 dotool/ydotool 就自动改用 uinput。
+    //          会话类型程序自己能看出来，一般不用改。
+    //   xtest  强制 libnut/XTest。只在 X11（以及 Windows/macOS）下有效。
+    //   uinput 强制用内核虚拟设备（dotool 或 ydotool）。Wayland 下唯一可用的方式。
+    // 重要：Wayland 会话里 XTest 会「调用成功、事件却到不了原生应用」，
+    // 日志看不出任何异常，但鼠标就是不动 —— 这就是需要 uinput 的原因。
+    "backend": "auto",
+    // 用 ydotool 时必须有个 ydotoold 守护进程在跑，否则每次调用都以 exit 2 失败。
+    // true（默认）：程序先找已经在跑的 ydotoold 复用（包括 ydotool 自己的系统服务，
+    //              那种以 root 运行、不需要你加入 input 组），没有就自己拉起一个
+    //              私有实例，退出时关掉。你不需要配置任何 systemd 服务。
+    // false：只复用、绝不自己拉起。适合你自己管理守护进程、不想多一个的情况。
+    // 注意：dotool 不需要守护进程，这个开关对它没有影响。
+    "manageYdotoold": true
+  },
+
+  // 两端之间的纯文本剪贴板共享
+  "clipboard": { "enabled": true },
+
+  "ui": {
+    // 启动程序时自动运行
+    "autoStart": true,
+    // 关闭窗口时最小化到托盘
+    "minimizeToTray": true
+  }
+}
